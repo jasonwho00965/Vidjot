@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-//const passport = require('passport');
+const passport = require('passport');
 const router = express.Router();
 
 // Load User Model
@@ -16,6 +16,15 @@ router.get('/login', (req, res) => {
 // User Register Route
 router.get('/register', (req, res) => {
   res.render('users/register');
+});
+
+//login form post
+router.post('/login',(req,res,next)=>{
+    passport.authenticate('local',{
+        successRedirect:'/ideas',
+        failureRedirect:'/users/login',
+        failureFlash: true
+    })(req,res,next);
 });
 
 // Register Form POST
@@ -42,7 +51,7 @@ router.post('/register', (req, res) => {
     User.findOne({email: req.body.email})
       .then(user => {
         if(user){
-           console.log('email has been taken')
+          req.flash('error_msg','email has been taken');
           res.redirect('/users/login');
         } else {
           const newUser = new User({
@@ -56,6 +65,7 @@ router.post('/register', (req, res) => {
               newUser.password = hash;
               newUser.save()
                 .then(user => {
+                  req.flash('succes_msg','You are now registered and can log in');
                   res.redirect('/users/login');
                 })
                 .catch(err => {
@@ -68,5 +78,15 @@ router.post('/register', (req, res) => {
       });
   }
 });
+
+// Logout User
+router.get('/logout', (req, res) => {
+    // res.clearCookie('connect.sid');
+    // req.session.destroy();
+    req.logOut();
+    req.flash('success_msg', 'You are logged out');
+    res.redirect('/users/login');
+  });
+
 
 module.exports = router;

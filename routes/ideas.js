@@ -8,6 +8,7 @@ router.delete('/:id',(req,res)=>{
     // res.send('nb小老弟')
     Idea.remove({_id:req.params.id})
         .then(()=>{
+            req.flash('success_msg','Video idea removed');
             res.redirect('/ideas');
         })
 });
@@ -23,6 +24,7 @@ router.put('/:id',(req,res) => {
         idea.details = req.body.details;
         idea.save()
             .then(idea=>{
+                req.flash('success_msg','Video idea updated');
                 res.redirect('/ideas');
             })
     });
@@ -58,6 +60,7 @@ router.post('/',(req,res)=>{
         new Idea(newUser)
             .save()
             .then(idea => {
+                req.flash('success_msg', 'Video idea added');
                 res.redirect('/ideas');
             })
     }
